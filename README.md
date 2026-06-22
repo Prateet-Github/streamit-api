@@ -1,3 +1,3 @@
 # StreamIt Backend
 
-A scalable video processing backend powering StreamIt written in Go.  
+A scalable video processing server written in Go.  

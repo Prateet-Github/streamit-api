@@ -1,13 +1,20 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	"log"
+
+	"github.com/Prateet-Github/streamit-api/internal/app"
+	"github.com/Prateet-Github/streamit-api/internal/config"
+)
 
 func main() {
-	router := gin.Default()
-	router.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "pong",
-		})
-	})
-	router.Run()
+	cfg := config.Load()
+
+	server := app.New()
+
+	log.Printf("Server running on :%s", cfg.Port)
+
+	if err := server.Run(":" + cfg.Port); err != nil {
+		log.Fatal(err)
+	}
 }
