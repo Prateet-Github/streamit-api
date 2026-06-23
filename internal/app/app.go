@@ -11,7 +11,7 @@ import (
 )
 
 func New(cfg *config.Config) *gin.Engine {
-	client, err := database.Connect(cfg.MongoURI)
+	client, err := database.Connect(cfg.MongoURI, cfg.DatabaseName)
 
 	if err != nil {
 		log.Fatal(err)

@@ -8,7 +8,12 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
-func Connect(uri string) (*mongo.Client, error) {
+type Database struct {
+	Client *mongo.Client
+	DB     *mongo.Database
+}
+
+func Connect(uri string, dbName string) (*Database, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -22,5 +27,8 @@ func Connect(uri string) (*mongo.Client, error) {
 		return nil, err
 	}
 
-	return client, nil
+	return &Database{
+		Client: client,
+		DB:     client.Database(dbName),
+	}, nil
 }
