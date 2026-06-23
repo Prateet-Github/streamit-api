@@ -2,7 +2,7 @@
 
 A scalable video processing server written in Go.
 
---
+---
 
 ## Tech Stack
 

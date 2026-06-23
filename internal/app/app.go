@@ -7,11 +7,16 @@ import (
 
 	"github.com/Prateet-Github/streamit-api/internal/config"
 	"github.com/Prateet-Github/streamit-api/internal/database"
+	"github.com/Prateet-Github/streamit-api/internal/handlers"
+	"github.com/Prateet-Github/streamit-api/internal/repositories"
 	"github.com/Prateet-Github/streamit-api/internal/routes"
 )
 
 func New(cfg *config.Config) *gin.Engine {
-	client, err := database.Connect(cfg.MongoURI, cfg.DatabaseName)
+	db, err := database.Connect(
+		cfg.MongoURI,
+		cfg.DatabaseName,
+	)
 
 	if err != nil {
 		log.Fatal(err)
@@ -19,12 +24,13 @@ func New(cfg *config.Config) *gin.Engine {
 
 	log.Println("MongoDB connected")
 
-	_ = client
+	userRepo := repositories.NewUserRepository(db)
+	authHandler := handlers.NewAuthHandler(userRepo)
 
 	router := gin.Default()
 
 	routes.RegisterHealthRoutes(router)
-	routes.RegisterAuthRoutes(router)
+	routes.RegisterAuthRoutes(router, authHandler)
 
 	return router
 }
