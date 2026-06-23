@@ -10,7 +10,7 @@ import (
 func main() {
 	cfg := config.Load()
 
-	server := app.New()
+	server := app.New(cfg)
 
 	log.Printf("Server running on :%s", cfg.Port)
 
