@@ -24,6 +24,7 @@ func New(cfg *config.Config) *gin.Engine {
 	router := gin.Default()
 
 	routes.RegisterHealthRoutes(router)
+	routes.RegisterAuthRoutes(router)
 
 	return router
 }
