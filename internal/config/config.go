@@ -19,6 +19,9 @@ type Config struct {
 
 	S3RawBucket  string
 	S3ProdBucket string
+
+	RedisHost string
+	RedisPort string
 }
 
 func Load() *Config {
@@ -39,5 +42,7 @@ func Load() *Config {
 		AWSSecretAccessKey: os.Getenv("AWS_SECRET_ACCESS_KEY"),
 		S3RawBucket:        os.Getenv("S3_RAW_BUCKET"),
 		S3ProdBucket:       os.Getenv("S3_PROD_BUCKET"),
+		RedisHost:          os.Getenv("REDIS_HOST"),
+		RedisPort:          os.Getenv("REDIS_PORT"),
 	}
 }

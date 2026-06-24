@@ -8,6 +8,7 @@ import (
 	"github.com/Prateet-Github/streamit-api/internal/config"
 	"github.com/Prateet-Github/streamit-api/internal/database"
 	"github.com/Prateet-Github/streamit-api/internal/handlers"
+	"github.com/Prateet-Github/streamit-api/internal/queue"
 	"github.com/Prateet-Github/streamit-api/internal/repositories"
 	"github.com/Prateet-Github/streamit-api/internal/routes"
 	"github.com/Prateet-Github/streamit-api/internal/s3"
@@ -34,6 +35,14 @@ func New(cfg *config.Config) *gin.Engine {
 	}
 
 	_ = s3Client
+
+	redisClient := queue.NewRedisClient(cfg)
+
+	if err := queue.Ping(redisClient); err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println("Redis connected")
 
 	log.Println("S3 client connected")
 	log.Println("MongoDB connected")
