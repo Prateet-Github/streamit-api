@@ -14,14 +14,17 @@ import (
 )
 
 type AuthHandler struct {
-	userRepo *repositories.UserRepository
+	userRepo  *repositories.UserRepository
+	jwtSecret string
 }
 
 func NewAuthHandler(
 	userRepo *repositories.UserRepository,
+	jwtSecret string,
 ) *AuthHandler {
 	return &AuthHandler{
-		userRepo: userRepo,
+		userRepo:  userRepo,
+		jwtSecret: jwtSecret,
 	}
 }
 
@@ -139,8 +142,21 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
+	token, err := utils.GenerateToken(
+		user.ID.Hex(),
+		h.jwtSecret,
+	)
+
+	if err != nil {
+		c.JSON(500, gin.H{
+			"error": "failed to generate token",
+		})
+		return
+	}
+
 	c.JSON(200, gin.H{
 		"message": "login successful",
+		"token":   token,
 		"user":    user,
 	})
 }

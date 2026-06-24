@@ -12,6 +12,7 @@ type Config struct {
 	Env          string
 	MongoURI     string
 	DatabaseName string
+	JWTSecret    string
 }
 
 func Load() *Config {
@@ -26,5 +27,6 @@ func Load() *Config {
 		Env:          os.Getenv("APP_ENV"),
 		MongoURI:     os.Getenv("MONGODB_URI"),
 		DatabaseName: os.Getenv("DATABASE_NAME"),
+		JWTSecret:    os.Getenv("JWT_SECRET"),
 	}
 }

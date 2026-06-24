@@ -25,7 +25,7 @@ func New(cfg *config.Config) *gin.Engine {
 	log.Println("MongoDB connected")
 
 	userRepo := repositories.NewUserRepository(db)
-	authHandler := handlers.NewAuthHandler(userRepo)
+	authHandler := handlers.NewAuthHandler(userRepo, cfg.JWTSecret)
 
 	router := gin.Default()
 
