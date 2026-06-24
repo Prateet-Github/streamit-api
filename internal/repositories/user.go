@@ -5,6 +5,7 @@ import (
 
 	"github.com/Prateet-Github/streamit-api/internal/database"
 	"github.com/Prateet-Github/streamit-api/internal/models"
+	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
@@ -26,4 +27,42 @@ func (r *UserRepository) Create(
 	_, err := r.collection.InsertOne(ctx, user)
 
 	return err
+}
+
+func (r *UserRepository) FindByEmail(
+	ctx context.Context,
+	email string,
+) (*models.User, error) {
+
+	var user models.User
+
+	err := r.collection.FindOne(
+		ctx,
+		bson.M{"email": email},
+	).Decode(&user)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+func (r *UserRepository) FindByUsername(
+
+	ctx context.Context,
+	username string,
+
+) (*models.User, error) {
+
+	var user models.User
+	err := r.collection.FindOne(
+		ctx,
+		bson.M{"username": username},
+	).Decode(&user)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+
 }
