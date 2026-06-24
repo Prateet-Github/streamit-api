@@ -53,3 +53,8 @@ type Video struct {
 	CreatedAt time.Time `bson:"createdAt" json:"createdAt"`
 	UpdatedAt time.Time `bson:"updatedAt" json:"updatedAt"`
 }
+
+type UploadURLRequest struct {
+	FileName string `json:"fileName"`
+	FileType string `json:"fileType"`
+}
