@@ -41,7 +41,9 @@ func New(cfg *config.Config) *gin.Engine {
 
 	userRepo := repositories.NewUserRepository(db)
 	authHandler := handlers.NewAuthHandler(userRepo, cfg.JWTSecret)
-	videoHandler := handlers.NewVideoHandler(s3Client, cfg)
+
+	videoRepo := repositories.NewVideoRepository(db)
+	videoHandler := handlers.NewVideoHandler(s3Client, cfg, videoRepo)
 
 	router := gin.Default()
 

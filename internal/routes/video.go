@@ -14,8 +14,6 @@ func RegisterVideoRoutes(
 	videos := router.Group("/api/videos")
 	videos.Use(middlewares.Auth(jwtSecret))
 
-	videos.POST(
-		"/upload-url",
-		videoHandler.GetUploadURL,
-	)
+	videos.POST("/upload-url", videoHandler.GetUploadURL)
+	videos.POST("/confirm-upload", videoHandler.ConfirmUpload)
 }

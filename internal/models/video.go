@@ -58,3 +58,9 @@ type UploadURLRequest struct {
 	FileName string `json:"fileName"`
 	FileType string `json:"fileType"`
 }
+
+type ConfirmUploadRequest struct {
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	S3Key       string `json:"s3Key"`
+}
