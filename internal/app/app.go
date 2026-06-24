@@ -22,7 +22,12 @@ func New(cfg *config.Config) *gin.Engine {
 		log.Fatal(err)
 	}
 
+	if err := database.CreateIndexes(db); err != nil {
+		log.Fatal(err)
+	}
+
 	log.Println("MongoDB connected")
+	log.Println("Indexes created")
 
 	userRepo := repositories.NewUserRepository(db)
 	authHandler := handlers.NewAuthHandler(userRepo, cfg.JWTSecret)
