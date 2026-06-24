@@ -29,8 +29,10 @@ func NewAuthHandler(
 }
 
 func (h *AuthHandler) Register(c *gin.Context) {
+	// bind request body to struct
 	var req models.RegisterRequest
 
+	// validate request body
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(400, gin.H{
 			"error": err.Error(),
@@ -38,6 +40,7 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
+	// check if email already exists
 	existingUser, err := h.userRepo.FindByEmail(
 		c.Request.Context(),
 		req.Email,
@@ -57,6 +60,7 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
+	// check if username already exists
 	existingUser, err = h.userRepo.FindByUsername(
 		c.Request.Context(),
 		req.Username,
@@ -76,6 +80,7 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
+	// hash password
 	hashedPassword, err := utils.HashPassword(req.Password)
 	if err != nil {
 		c.JSON(500, gin.H{
@@ -84,6 +89,7 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
+	// create user
 	user := &models.User{
 		ID:        bson.NewObjectID(),
 		Name:      req.Name,
@@ -107,12 +113,15 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
+	// return user
 	c.JSON(201, user)
 }
 
 func (h *AuthHandler) Login(c *gin.Context) {
+	// bind request body to struct
 	var req models.LoginRequest
 
+	// validate request body
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(400, gin.H{
 			"error": err.Error(),
@@ -120,6 +129,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
+	// find user by email
 	user, err := h.userRepo.FindByEmail(
 		c.Request.Context(),
 		req.Email,
@@ -132,6 +142,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
+	// check if password is correct
 	if !utils.CheckPassword(
 		req.Password,
 		user.Password,
@@ -142,6 +153,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
+	// generate token
 	token, err := utils.GenerateToken(
 		user.ID.Hex(),
 		h.jwtSecret,
@@ -154,6 +166,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
+	// return token and user
 	c.JSON(200, gin.H{
 		"message": "login successful",
 		"token":   token,
@@ -162,7 +175,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 }
 
 func (h *AuthHandler) Me(c *gin.Context) {
-
+	// get user id from context
 	userID, exists := c.Get("userId")
 
 	if !exists {
@@ -172,6 +185,7 @@ func (h *AuthHandler) Me(c *gin.Context) {
 		return
 	}
 
+	// convert user id to bson.ObjectID
 	objectID, err := bson.ObjectIDFromHex(
 		userID.(string),
 	)
@@ -183,6 +197,7 @@ func (h *AuthHandler) Me(c *gin.Context) {
 		return
 	}
 
+	// find user by id
 	user, err := h.userRepo.FindByID(
 		c.Request.Context(),
 		objectID,
@@ -195,6 +210,7 @@ func (h *AuthHandler) Me(c *gin.Context) {
 		return
 	}
 
+	// return user
 	c.JSON(200, gin.H{
 		"user": user,
 	})

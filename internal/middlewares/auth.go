@@ -10,6 +10,7 @@ import (
 func Auth(secret string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 
+		// get token from header
 		authHeader := c.GetHeader("Authorization")
 
 		if authHeader == "" {
@@ -20,11 +21,13 @@ func Auth(secret string) gin.HandlerFunc {
 			return
 		}
 
+		// remove "Bearer " prefix from token
 		tokenString := strings.TrimPrefix(
 			authHeader,
 			"Bearer ",
 		)
 
+		// verify token
 		claims, err := utils.VerifyToken(
 			tokenString,
 			secret,
@@ -38,6 +41,7 @@ func Auth(secret string) gin.HandlerFunc {
 			return
 		}
 
+		// set userId in context
 		c.Set(
 			"userId",
 			claims["userId"],
