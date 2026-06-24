@@ -10,6 +10,7 @@ import (
 	"github.com/Prateet-Github/streamit-api/internal/handlers"
 	"github.com/Prateet-Github/streamit-api/internal/repositories"
 	"github.com/Prateet-Github/streamit-api/internal/routes"
+	"github.com/Prateet-Github/streamit-api/internal/s3"
 )
 
 func New(cfg *config.Config) *gin.Engine {
@@ -26,6 +27,15 @@ func New(cfg *config.Config) *gin.Engine {
 		log.Fatal(err)
 	}
 
+	s3Client, err := s3.NewClient(cfg)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_ = s3Client
+
+	log.Println("S3 client connected")
 	log.Println("MongoDB connected")
 	log.Println("Indexes created")
 
