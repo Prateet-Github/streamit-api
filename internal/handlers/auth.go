@@ -160,3 +160,42 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		"user":    user,
 	})
 }
+
+func (h *AuthHandler) Me(c *gin.Context) {
+
+	userID, exists := c.Get("userId")
+
+	if !exists {
+		c.JSON(401, gin.H{
+			"error": "unauthorized",
+		})
+		return
+	}
+
+	objectID, err := bson.ObjectIDFromHex(
+		userID.(string),
+	)
+
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": "invalid user id",
+		})
+		return
+	}
+
+	user, err := h.userRepo.FindByID(
+		c.Request.Context(),
+		objectID,
+	)
+
+	if err != nil {
+		c.JSON(404, gin.H{
+			"error": "user not found",
+		})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"user": user,
+	})
+}

@@ -30,7 +30,7 @@ func New(cfg *config.Config) *gin.Engine {
 	router := gin.Default()
 
 	routes.RegisterHealthRoutes(router)
-	routes.RegisterAuthRoutes(router, authHandler)
+	routes.RegisterAuthRoutes(router, authHandler, cfg.JWTSecret)
 
 	return router
 }
