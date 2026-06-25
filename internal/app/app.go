@@ -15,47 +15,45 @@ import (
 )
 
 func New(cfg *config.Config) *gin.Engine {
-	db, err := database.Connect(
-		cfg.MongoURI,
-		cfg.DatabaseName,
-	)
-
+	// 1. MongoDB
+	db, err := database.Connect(cfg.MongoURI, cfg.DatabaseName)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("MongoDB connection failed: ", err)
 	}
+	log.Println("MongoDB connected successfully")
 
 	if err := database.CreateIndexes(db); err != nil {
-		log.Fatal(err)
+		log.Fatal("MongoDB index creation failed: ", err)
 	}
+	log.Println("MongoDB database indexes created")
 
+	// 2. AWS S3
 	s3Client, err := s3.NewClient(cfg)
-
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("S3 client initialization failed: ", err)
 	}
+	log.Println("S3 client connected successfully")
 
-	_ = s3Client
-
+	// 3. Redis Core
 	redisClient := queue.NewRedisClient(cfg)
-
 	if err := queue.Ping(redisClient); err != nil {
-		log.Fatal(err)
+		log.Fatal("Redis ping failed: ", err)
 	}
+	log.Println("Redis client connected and verified")
+	redisClient.Close() 
 
-	log.Println("Redis connected")
+	// 4. Asynq Client
+	asynqClient := queue.NewAsynqClient(cfg)
+	log.Println("Asynq client initialized successfully")
 
-	log.Println("S3 client connected")
-	log.Println("MongoDB connected")
-	log.Println("Indexes created")
-	log.Println("Asynq client connected")
-
+	// 5. Wire Repositories & Handlers
 	userRepo := repositories.NewUserRepository(db)
 	authHandler := handlers.NewAuthHandler(userRepo, cfg.JWTSecret)
 
-	asynqClient := queue.NewAsynqClient(cfg)
 	videoRepo := repositories.NewVideoRepository(db)
 	videoHandler := handlers.NewVideoHandler(s3Client, cfg, videoRepo, asynqClient)
 
+	// 6. Router Setup
 	router := gin.Default()
 
 	routes.RegisterHealthRoutes(router)
