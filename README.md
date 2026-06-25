@@ -1,6 +1,10 @@
-# StreamIt Backend
+# StreamIt API
 
-A scalable video processing server written in Go.
+![streamit-api](assets/worker.png)
+
+Backend API for StreamIt, built with Go.
+
+Handles authentication, video uploads, metadata management, presigned S3 uploads, background job scheduling, and communication with the video processing worker.
 
 ---
 
@@ -9,6 +13,17 @@ A scalable video processing server written in Go.
 - Go
 - Gin
 - Asynq
-- Redis
 - Ffmpeg
+- Redis 
 - AWS S3
+- MongoDB
+
+## Features
+
+- JWT authentication
+- Presigned S3 upload URLs
+- Video metadata management
+- Background job scheduling
+- Worker callback endpoints
+- RESTful API
+- Dockerized
