@@ -16,4 +16,8 @@ func RegisterVideoRoutes(
 
 	videos.POST("/upload-url", videoHandler.GetUploadURL)
 	videos.POST("/confirm-upload", videoHandler.ConfirmUpload)
+
+	internal := router.Group("/internal/videos")
+
+	internal.POST("/:id/complete", videoHandler.CompleteVideo)
 }

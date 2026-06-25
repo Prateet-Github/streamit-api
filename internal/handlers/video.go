@@ -171,3 +171,55 @@ func (h *VideoHandler) ConfirmUpload(c *gin.Context) {
 		"video":   video,
 	})
 }
+
+func (h *VideoHandler) CompleteVideo(c *gin.Context) {
+
+	videoID := c.Param("id")
+
+	var req models.CompleteVideoRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	id, err := bson.ObjectIDFromHex(videoID)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": "invalid video id",
+		})
+		return
+	}
+
+	video, err := h.videoRepo.FindByID(
+		c.Request.Context(),
+		id,
+	)
+
+	if err != nil {
+		c.JSON(404, gin.H{
+			"error": "video not found",
+		})
+		return
+	}
+
+	video.Status = models.StatusCompleted
+	video.HLSURL = req.HLSURL
+	video.ThumbnailKey = req.ThumbnailKey
+	video.ProcessingProgress = 100
+	video.UpdatedAt = time.Now()
+
+	if err := h.videoRepo.Update(
+		c.Request.Context(),
+		video,
+	); err != nil {
+		c.JSON(500, gin.H{
+			"error": "failed to update video",
+		})
+		return
+	}
+
+	c.Status(204)
+}

@@ -64,3 +64,8 @@ type ConfirmUploadRequest struct {
 	Description string `json:"description"`
 	S3Key       string `json:"s3Key"`
 }
+
+type CompleteVideoRequest struct {
+	HLSURL       string `json:"hlsUrl"`
+	ThumbnailKey string `json:"thumbnailKey"`
+}
