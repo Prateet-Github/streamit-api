@@ -47,12 +47,14 @@ func New(cfg *config.Config) *gin.Engine {
 	log.Println("S3 client connected")
 	log.Println("MongoDB connected")
 	log.Println("Indexes created")
+	log.Println("Asynq client connected")
 
 	userRepo := repositories.NewUserRepository(db)
 	authHandler := handlers.NewAuthHandler(userRepo, cfg.JWTSecret)
 
+	asynqClient := queue.NewAsynqClient(cfg)
 	videoRepo := repositories.NewVideoRepository(db)
-	videoHandler := handlers.NewVideoHandler(s3Client, cfg, videoRepo)
+	videoHandler := handlers.NewVideoHandler(s3Client, cfg, videoRepo, asynqClient)
 
 	router := gin.Default()
 
