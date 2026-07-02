@@ -50,6 +50,8 @@ type Video struct {
 
 	LikesCount int64 `bson:"likesCount" json:"likesCount"`
 
+	CommentsCount int64 `bson:"commentsCount" json:"commentsCount"`
+
 	CreatedAt time.Time `bson:"createdAt" json:"createdAt"`
 	UpdatedAt time.Time `bson:"updatedAt" json:"updatedAt"`
 }

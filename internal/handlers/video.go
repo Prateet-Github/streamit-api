@@ -124,6 +124,7 @@ func (h *VideoHandler) ConfirmUpload(c *gin.Context) {
 		ProcessingProgress: 0,
 		Views:              0,
 		LikesCount:         0,
+		CommentsCount:      0,
 		Visibility:         models.VisibilityPublic,
 		CreatedAt:          time.Now(),
 		UpdatedAt:          time.Now(),
