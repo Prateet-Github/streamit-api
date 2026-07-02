@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"log"
 
 	"github.com/Prateet-Github/streamit-api/internal/models"
 	"go.mongodb.org/mongo-driver/v2/bson"
@@ -44,8 +45,14 @@ func (r *LikeRepository) Create(
 	like *models.Like,
 ) error {
 
-	_, err := r.collection.InsertOne(ctx, like)
-	return err
+	result, err := r.collection.InsertOne(ctx, like)
+	if err != nil {
+		return err
+	}
+
+	log.Printf("Inserted Like ID: %v", result.InsertedID)
+
+	return nil
 }
 
 func (r *LikeRepository) Delete(

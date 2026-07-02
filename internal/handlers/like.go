@@ -192,3 +192,61 @@ func (h *LikeHandler) getUserAndVideo(c *gin.Context) (
 
 	return userID, videoID, true
 }
+
+func (h *LikeHandler) GetLikeStatus(c *gin.Context) {
+
+	videoID, err := bson.ObjectIDFromHex(c.Param("videoId"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid video ID",
+		})
+		return
+	}
+
+	userIDValue, exists := c.Get("userId")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Unauthorized",
+		})
+		return
+	}
+
+	userIDHex := userIDValue.(string)
+
+	userID, err := bson.ObjectIDFromHex(userIDHex)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Invalid user ID",
+		})
+		return
+	}
+
+	video, err := h.videoRepo.FindByID(
+		c.Request.Context(),
+		videoID,
+	)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "Video not found",
+		})
+		return
+	}
+
+	like, err := h.likeRepo.FindByUserAndVideo(
+		c.Request.Context(),
+		userID,
+		videoID,
+	)
+
+	if err != nil && err != mongo.ErrNoDocuments {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Internal server error",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"liked": like != nil,
+		"likesCount": video.LikesCount,
+	})
+}

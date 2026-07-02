@@ -79,7 +79,7 @@ func (r *VideoRepository) IncrementLikes(
 		},
 		bson.M{
 			"$inc": bson.M{
-				"likes": delta,
+				"likesCount": delta,
 			},
 		},
 	)
