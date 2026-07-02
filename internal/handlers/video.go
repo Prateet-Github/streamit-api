@@ -26,7 +26,7 @@ type VideoHandler struct {
 	cfg         *config.Config
 	videoRepo   *repositories.VideoRepository
 	asynqClient *asynq.Client
-	userRepo  *repositories.UserRepository
+	userRepo    *repositories.UserRepository
 }
 
 func NewVideoHandler(
@@ -41,7 +41,7 @@ func NewVideoHandler(
 		cfg:         cfg,
 		videoRepo:   videoRepo,
 		asynqClient: asynqClient,
-		userRepo:  userRepo,
+		userRepo:    userRepo,
 	}
 }
 
@@ -231,47 +231,48 @@ func (h *VideoHandler) CompleteVideo(c *gin.Context) {
 
 func (h *VideoHandler) GetAllVideos(c *gin.Context) {
 
-videos, err := h.videoRepo.FindAll(
-	c.Request.Context(),
-)
-if err != nil {
-	c.JSON(http.StatusInternalServerError, gin.H{
-		"error": "Failed to fetch videos",
-	})
-	return
-}
-
-response := make([]models.VideoListResponse, 0, len(videos))
-
-for _, video := range videos {
-
-	user, err := h.userRepo.FindByID(
+	videos, err := h.videoRepo.FindAll(
 		c.Request.Context(),
-		video.OwnerID,
 	)
-
 	if err != nil {
-		continue
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to fetch videos",
+		})
+		return
 	}
 
-	response = append(response, models.VideoListResponse{
-		ID:           video.ID.Hex(),
-		Title:        video.Title,
-		ThumbnailKey: video.ThumbnailKey,
-		HLSURL:       video.HLSURL,
-		CreatedAt:    video.CreatedAt,
-		Views:        video.Views,
-		Owner: &models.OwnerResponse{
-			ID:       user.ID.Hex(),
-			Name:     user.Name,
-			Username: user.Username,
-			Email:    user.Email,
-		},
-	})
+	response := make([]models.VideoListResponse, 0, len(videos))
+
+	for _, video := range videos {
+
+		user, err := h.userRepo.FindByID(
+			c.Request.Context(),
+			video.OwnerID,
+		)
+
+		if err != nil {
+			continue
+		}
+
+		response = append(response, models.VideoListResponse{
+			ID:           video.ID.Hex(),
+			Title:        video.Title,
+			ThumbnailKey: video.ThumbnailKey,
+			HLSURL:       video.HLSURL,
+			CreatedAt:    video.CreatedAt,
+			Views:        video.Views,
+			Owner: &models.OwnerResponse{
+				ID:       user.ID.Hex(),
+				Name:     user.Name,
+				Username: user.Username,
+				Email:    user.Email,
+			},
+		})
+	}
+
+	c.JSON(http.StatusOK, response)
 }
 
-c.JSON(http.StatusOK, response)
-}
 // single whole video
 
 func (h *VideoHandler) GetVideoByID(c *gin.Context) {
@@ -361,6 +362,60 @@ func (h *VideoHandler) GetMyVideos(c *gin.Context) {
 	}
 
 	for _, video := range videos {
+
+		response = append(response, models.VideoListResponse{
+			ID:           video.ID.Hex(),
+			Title:        video.Title,
+			ThumbnailKey: video.ThumbnailKey,
+			HLSURL:       video.HLSURL,
+			CreatedAt:    video.CreatedAt,
+			Views:        video.Views,
+			Status:       video.Status,
+			Owner: &models.OwnerResponse{
+				ID:       user.ID.Hex(),
+				Name:     user.Name,
+				Username: user.Username,
+				Email:    user.Email,
+			},
+		})
+	}
+
+	c.JSON(http.StatusOK, response)
+}
+
+func (h *VideoHandler) SearchVideos(c *gin.Context) {
+
+	query := c.Query("q")
+
+	if query == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Query is required",
+		})
+		return
+	}
+
+	videos, err := h.videoRepo.Search(
+		c.Request.Context(),
+		query,
+	)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to search videos",
+		})
+		return
+	}
+
+	response := make([]models.VideoListResponse, 0, len(videos))
+
+	for _, video := range videos {
+
+		user, err := h.userRepo.FindByID(
+			c.Request.Context(),
+			video.OwnerID,
+		)
+		if err != nil {
+			continue
+		}
 
 		response = append(response, models.VideoListResponse{
 			ID:           video.ID.Hex(),

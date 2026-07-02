@@ -152,3 +152,42 @@ func (r *VideoRepository) FindByOwnerID(
 
 	return videos, nil
 }
+
+func (r *VideoRepository) Search(
+	ctx context.Context,
+	query string,
+) ([]models.Video, error) {
+
+	filter := bson.M{
+		"title": bson.M{
+			"$regex":   query,
+			"$options": "i",
+		},
+		"status":     models.StatusCompleted,
+		"visibility": models.VisibilityPublic,
+	}
+
+	opts := options.Find().
+		SetSort(bson.D{
+			{Key: "createdAt", Value: -1},
+		}).
+		SetLimit(20)
+
+	cursor, err := r.collection.Find(
+		ctx,
+		filter,
+		opts,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var videos []models.Video
+
+	if err := cursor.All(ctx, &videos); err != nil {
+		return nil, err
+	}
+
+	return videos, nil
+}

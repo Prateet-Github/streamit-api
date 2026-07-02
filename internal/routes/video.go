@@ -15,6 +15,7 @@ func RegisterVideoRoutes(
 
 	// Public
 	videos.GET("/", videoHandler.GetAllVideos)
+	videos.GET("/search", videoHandler.SearchVideos)
 	videos.GET("/:id", videoHandler.GetVideoByID)
 
 	// Protected
