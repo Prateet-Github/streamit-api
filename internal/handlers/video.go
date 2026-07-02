@@ -14,6 +14,8 @@ import (
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/v2/bson"
 
+	"net/http"
+
 	"github.com/Prateet-Github/streamit-api/internal/queue"
 	awss3 "github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/hibiken/asynq"
@@ -222,4 +224,19 @@ func (h *VideoHandler) CompleteVideo(c *gin.Context) {
 	}
 
 	c.Status(204)
+}
+
+func (h *VideoHandler) GetAllVideos(c *gin.Context) {
+
+	videos, err := h.videoRepo.FindAll(
+		c.Request.Context(),
+	)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to fetch videos",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, videos)
 }

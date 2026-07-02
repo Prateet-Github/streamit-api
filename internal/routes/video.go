@@ -11,7 +11,10 @@ func RegisterVideoRoutes(
 	videoHandler *handlers.VideoHandler,
 	jwtSecret string,
 ) {
-	videos := router.Group("/api/videos")
+	videos := router.Group("/api/video")
+
+	videos.GET("/", videoHandler.GetAllVideos)
+
 	videos.Use(middlewares.Auth(jwtSecret))
 
 	videos.POST("/upload-url", videoHandler.GetUploadURL)

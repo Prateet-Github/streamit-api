@@ -8,6 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
 type VideoRepository struct {
@@ -84,4 +85,37 @@ func (r *VideoRepository) IncrementLikes(
 	)
 
 	return err
+}
+
+// find all videos
+
+func (r *VideoRepository) FindAll(
+	ctx context.Context,
+) ([]models.Video, error) {
+
+	opts := options.Find().
+		SetSort(
+			bson.D{
+				{Key: "createdAt", Value: -1},
+			},
+		)
+
+	cursor, err := r.collection.Find(
+		ctx,
+		bson.M{},
+		opts,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var videos []models.Video
+
+	if err := cursor.All(ctx, &videos); err != nil {
+		return nil, err
+	}
+
+	return videos, nil
 }

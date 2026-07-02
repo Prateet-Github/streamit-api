@@ -12,6 +12,7 @@ import (
 	"github.com/Prateet-Github/streamit-api/internal/repositories"
 	"github.com/Prateet-Github/streamit-api/internal/routes"
 	"github.com/Prateet-Github/streamit-api/internal/s3"
+	"github.com/gin-contrib/cors"
 )
 
 func New(cfg *config.Config) *gin.Engine {
@@ -58,6 +59,27 @@ func New(cfg *config.Config) *gin.Engine {
 
 	// 6. Router Setup
 	router := gin.Default()
+
+	router.Use(cors.New(cors.Config{
+		AllowOrigins: []string{
+			"http://localhost:3000",
+			"http://localhost:5173",
+		},
+		AllowMethods: []string{
+			"GET",
+			"POST",
+			"PUT",
+			"PATCH",
+			"DELETE",
+			"OPTIONS",
+		},
+		AllowHeaders: []string{
+			"Origin",
+			"Content-Type",
+			"Authorization",
+		},
+		AllowCredentials: true,
+	}))
 
 	routes.RegisterHealthRoutes(router)
 	routes.RegisterAuthRoutes(router, authHandler, cfg.JWTSecret)
