@@ -16,3 +16,8 @@ type User struct {
 	CreatedAt time.Time     `bson:"createdAt" json:"createdAt"`
 	UpdatedAt time.Time     `bson:"updatedAt" json:"updatedAt"`
 }
+
+type UpdateProfileRequest struct {
+	Name string `json:"name"`
+	Bio  string `json:"bio"`
+}

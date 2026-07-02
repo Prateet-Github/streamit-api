@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"net/http"
 	"time"
 
 	"errors"
@@ -213,5 +214,48 @@ func (h *AuthHandler) Me(c *gin.Context) {
 	// return user
 	c.JSON(200, gin.H{
 		"user": user,
+	})
+}
+
+func (h *AuthHandler) UpdateProfile(c *gin.Context) {
+
+	var req models.UpdateProfileRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	userIDHex := c.GetString("userId")
+
+	userID, err := bson.ObjectIDFromHex(userIDHex)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Invalid user",
+		})
+		return
+	}
+
+	user, err := h.userRepo.UpdateProfile(
+		c.Request.Context(),
+		userID,
+		req.Name,
+		req.Bio,
+	)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to update profile",
+		})
+		return
+	}
+
+	user.Password = ""
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Profile updated",
+		"user":    user,
 	})
 }

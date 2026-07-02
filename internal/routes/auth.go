@@ -20,5 +20,6 @@ func RegisterAuthRoutes(
 	protected.Use(middlewares.Auth(jwtSecret))
 
 	protected.GET("/me", authHandler.Me)
+	protected.PATCH("/profile", authHandler.UpdateProfile)
 
 }
