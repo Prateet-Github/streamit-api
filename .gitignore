@@ -28,7 +28,7 @@ go.work.sum
 # .idea/
 # .vscode/
 
-DS_Store
+.DS_Store
 
 temp/
 

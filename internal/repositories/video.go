@@ -64,3 +64,24 @@ func (r *VideoRepository) Update(
 
 	return err
 }
+
+func (r *VideoRepository) IncrementLikes(
+	ctx context.Context,
+	videoID bson.ObjectID,
+	delta int,
+) error {
+
+	_, err := r.collection.UpdateOne(
+		ctx,
+		bson.M{
+			"_id": videoID,
+		},
+		bson.M{
+			"$inc": bson.M{
+				"likes": delta,
+			},
+		},
+	)
+
+	return err
+}

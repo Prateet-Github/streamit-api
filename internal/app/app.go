@@ -40,7 +40,7 @@ func New(cfg *config.Config) *gin.Engine {
 		log.Fatal("Redis ping failed: ", err)
 	}
 	log.Println("Redis client connected and verified")
-	redisClient.Close() 
+	redisClient.Close()
 
 	// 4. Asynq Client
 	asynqClient := queue.NewAsynqClient(cfg)
@@ -53,12 +53,16 @@ func New(cfg *config.Config) *gin.Engine {
 	videoRepo := repositories.NewVideoRepository(db)
 	videoHandler := handlers.NewVideoHandler(s3Client, cfg, videoRepo, asynqClient)
 
+	likeRepo := repositories.NewLikeRepository(db.DB)
+	likeHandler := handlers.NewLikeHandler(likeRepo, videoRepo)
+
 	// 6. Router Setup
 	router := gin.Default()
 
 	routes.RegisterHealthRoutes(router)
 	routes.RegisterAuthRoutes(router, authHandler, cfg.JWTSecret)
 	routes.RegisterVideoRoutes(router, videoHandler, cfg.JWTSecret)
+	routes.RegisterLikeRoutes(router, likeHandler, cfg.JWTSecret)
 
 	return router
 }
