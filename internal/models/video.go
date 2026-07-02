@@ -78,21 +78,22 @@ type OwnerResponse struct {
 }
 
 type VideoResponse struct {
-	ID           string          `json:"id"`
-	Title        string          `json:"title"`
-	Description  string          `json:"description"`
-	HLSURL       string          `json:"hlsUrl"`
-	ThumbnailKey string          `json:"thumbnailKey"`
-	Status       VideoStatus     `json:"status"`
-	Owner         *OwnerResponse `json:"owner,omitempty"`
+	ID           string         `json:"id"`
+	Title        string         `json:"title"`
+	Description  string         `json:"description"`
+	HLSURL       string         `json:"hlsUrl"`
+	ThumbnailKey string         `json:"thumbnailKey"`
+	Status       VideoStatus    `json:"status"`
+	Owner        *OwnerResponse `json:"owner,omitempty"`
 }
 
 type VideoListResponse struct {
-	ID           string          `json:"_id"`
-	Title        string          `json:"title"`
-	ThumbnailKey string          `json:"thumbnailKey"`
-	HLSURL       string          `json:"hlsUrl"`
-	CreatedAt    time.Time       `json:"createdAt"`
-	Views        int64           `json:"views"`
-	Owner         *OwnerResponse `json:"owner,omitempty"`
+	ID           string         `json:"_id"`
+	Title        string         `json:"title"`
+	ThumbnailKey string         `json:"thumbnailKey"`
+	HLSURL       string         `json:"hlsUrl"`
+	CreatedAt    time.Time      `json:"createdAt"`
+	Views        int64          `json:"views"`
+	Owner        *OwnerResponse `json:"owner,omitempty"`
+	Status       VideoStatus    `json:"status"`
 }

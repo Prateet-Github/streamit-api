@@ -13,13 +13,17 @@ func RegisterVideoRoutes(
 ) {
 	videos := router.Group("/api/video")
 
+	// Public
 	videos.GET("/", videoHandler.GetAllVideos)
 	videos.GET("/:id", videoHandler.GetVideoByID)
 
-	videos.Use(middlewares.Auth(jwtSecret))
+	// Protected
+	auth := videos.Group("")
+	auth.Use(middlewares.Auth(jwtSecret))
 
-	videos.POST("/upload-url", videoHandler.GetUploadURL)
-	videos.POST("/confirm-upload", videoHandler.ConfirmUpload)
+	auth.GET("/my-videos", videoHandler.GetMyVideos)
+	auth.POST("/upload-url", videoHandler.GetUploadURL)
+	auth.POST("/confirm-upload", videoHandler.ConfirmUpload)
 
 	internal := router.Group("/internal/videos")
 

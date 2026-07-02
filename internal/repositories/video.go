@@ -119,3 +119,36 @@ func (r *VideoRepository) FindAll(
 
 	return videos, nil
 }
+
+// owner or video for the dashboard
+
+func (r *VideoRepository) FindByOwnerID(
+	ctx context.Context,
+	ownerID bson.ObjectID,
+) ([]models.Video, error) {
+
+	opts := options.Find().
+		SetSort(bson.D{
+			{Key: "createdAt", Value: -1},
+		})
+
+	cursor, err := r.collection.Find(
+		ctx,
+		bson.M{
+			"ownerId": ownerID,
+		},
+		opts,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var videos []models.Video
+
+	if err := cursor.All(ctx, &videos); err != nil {
+		return nil, err
+	}
+
+	return videos, nil
+}

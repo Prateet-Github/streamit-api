@@ -323,3 +323,61 @@ func (h *VideoHandler) GetVideoByID(c *gin.Context) {
 
 	c.JSON(http.StatusOK, response)
 }
+
+func (h *VideoHandler) GetMyVideos(c *gin.Context) {
+
+	userIDHex := c.GetString("userId")
+
+	userID, err := bson.ObjectIDFromHex(userIDHex)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Invalid user",
+		})
+		return
+	}
+
+	videos, err := h.videoRepo.FindByOwnerID(
+		c.Request.Context(),
+		userID,
+	)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to fetch videos",
+		})
+		return
+	}
+
+	response := make([]models.VideoListResponse, 0, len(videos))
+
+	user, err := h.userRepo.FindByID(
+		c.Request.Context(),
+		userID,
+	)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "User not found",
+		})
+		return
+	}
+
+	for _, video := range videos {
+
+		response = append(response, models.VideoListResponse{
+			ID:           video.ID.Hex(),
+			Title:        video.Title,
+			ThumbnailKey: video.ThumbnailKey,
+			HLSURL:       video.HLSURL,
+			CreatedAt:    video.CreatedAt,
+			Views:        video.Views,
+			Status:       video.Status,
+			Owner: &models.OwnerResponse{
+				ID:       user.ID.Hex(),
+				Name:     user.Name,
+				Username: user.Username,
+				Email:    user.Email,
+			},
+		})
+	}
+
+	c.JSON(http.StatusOK, response)
+}
