@@ -26,12 +26,14 @@ type VideoHandler struct {
 	cfg         *config.Config
 	videoRepo   *repositories.VideoRepository
 	asynqClient *asynq.Client
+	userRepo  *repositories.UserRepository
 }
 
 func NewVideoHandler(
 	s3Client *awss3.Client,
 	cfg *config.Config,
 	videoRepo *repositories.VideoRepository,
+	userRepo *repositories.UserRepository,
 	asynqClient *asynq.Client,
 ) *VideoHandler {
 	return &VideoHandler{
@@ -39,6 +41,7 @@ func NewVideoHandler(
 		cfg:         cfg,
 		videoRepo:   videoRepo,
 		asynqClient: asynqClient,
+		userRepo:  userRepo,
 	}
 }
 
@@ -228,15 +231,95 @@ func (h *VideoHandler) CompleteVideo(c *gin.Context) {
 
 func (h *VideoHandler) GetAllVideos(c *gin.Context) {
 
-	videos, err := h.videoRepo.FindAll(
+videos, err := h.videoRepo.FindAll(
+	c.Request.Context(),
+)
+if err != nil {
+	c.JSON(http.StatusInternalServerError, gin.H{
+		"error": "Failed to fetch videos",
+	})
+	return
+}
+
+response := make([]models.VideoListResponse, 0, len(videos))
+
+for _, video := range videos {
+
+	user, err := h.userRepo.FindByID(
 		c.Request.Context(),
+		video.OwnerID,
 	)
+
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to fetch videos",
+		continue
+	}
+
+	response = append(response, models.VideoListResponse{
+		ID:           video.ID.Hex(),
+		Title:        video.Title,
+		ThumbnailKey: video.ThumbnailKey,
+		HLSURL:       video.HLSURL,
+		CreatedAt:    video.CreatedAt,
+		Views:        video.Views,
+		Owner: &models.OwnerResponse{
+			ID:       user.ID.Hex(),
+			Name:     user.Name,
+			Username: user.Username,
+			Email:    user.Email,
+		},
+	})
+}
+
+c.JSON(http.StatusOK, response)
+}
+// single whole video
+
+func (h *VideoHandler) GetVideoByID(c *gin.Context) {
+
+	videoID, err := bson.ObjectIDFromHex(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid video ID",
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, videos)
+	video, err := h.videoRepo.FindByID(
+		c.Request.Context(),
+		videoID,
+	)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "Video not found",
+		})
+		return
+	}
+
+	user, err := h.userRepo.FindByID(
+		c.Request.Context(),
+		video.OwnerID,
+	)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Owner not found",
+		})
+		return
+	}
+
+	response := models.VideoResponse{
+		ID:           video.ID.Hex(),
+		Title:        video.Title,
+		Description:  video.Description,
+		HLSURL:       video.HLSURL,
+		ThumbnailKey: video.ThumbnailKey,
+		Status:       video.Status,
+		Owner: &models.OwnerResponse{
+			ID:       user.ID.Hex(),
+			Name:     user.Name,
+			Username: user.Username,
+			Email:    user.Email,
+		},
+	}
+
+	c.JSON(http.StatusOK, response)
 }

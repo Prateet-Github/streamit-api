@@ -52,7 +52,7 @@ func New(cfg *config.Config) *gin.Engine {
 	authHandler := handlers.NewAuthHandler(userRepo, cfg.JWTSecret)
 
 	videoRepo := repositories.NewVideoRepository(db)
-	videoHandler := handlers.NewVideoHandler(s3Client, cfg, videoRepo, asynqClient)
+	videoHandler := handlers.NewVideoHandler(s3Client, cfg, videoRepo, userRepo, asynqClient)
 
 	likeRepo := repositories.NewLikeRepository(db.DB)
 	likeHandler := handlers.NewLikeHandler(likeRepo, videoRepo)

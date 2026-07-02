@@ -14,6 +14,7 @@ func RegisterVideoRoutes(
 	videos := router.Group("/api/video")
 
 	videos.GET("/", videoHandler.GetAllVideos)
+	videos.GET("/:id", videoHandler.GetVideoByID)
 
 	videos.Use(middlewares.Auth(jwtSecret))
 
