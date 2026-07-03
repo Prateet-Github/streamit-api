@@ -14,6 +14,7 @@ func CreateIndexes(db *Database) error {
 	users := db.DB.Collection("users")
 	likes := db.DB.Collection("likes")
 	comments := db.DB.Collection("comments")
+	subscriptions := db.DB.Collection("subscriptions")
 
 	_, err := users.Indexes().CreateMany(
 		ctx,
@@ -73,6 +74,30 @@ func CreateIndexes(db *Database) error {
 	if err != nil {
 		return err
 	}
+
+	_, err = subscriptions.Indexes().CreateMany(
+		ctx,
+		[]mongo.IndexModel{
+			{
+				Keys: bson.D{
+					{Key: "subscriberId", Value: 1},
+					{Key: "channelId", Value: 1},
+				},
+				Options: options.Index().
+					SetUnique(true),
+			},
+			{
+				Keys: bson.D{
+					{Key: "channelId", Value: 1},
+				},
+			},
+			{
+				Keys: bson.D{
+					{Key: "subscriberId", Value: 1},
+				},
+			},
+		},
+	)
 
 	return nil
 }

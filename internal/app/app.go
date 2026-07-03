@@ -60,6 +60,9 @@ func New(cfg *config.Config) *gin.Engine {
 	commentRepo := repositories.NewCommentRepository(db.DB)
 	commentHandler := handlers.NewCommentHandler(commentRepo, videoRepo, userRepo)
 
+	subscriptionRepo := repositories.NewSubscriptionRepository(db.DB)
+	subscriptionHandler := handlers.NewSubscriptionHandler(subscriptionRepo, userRepo)
+
 	// 6. Router Setup
 	router := gin.Default()
 
@@ -89,5 +92,6 @@ func New(cfg *config.Config) *gin.Engine {
 	routes.RegisterVideoRoutes(router, videoHandler, cfg.JWTSecret)
 	routes.RegisterLikeRoutes(router, likeHandler, cfg.JWTSecret)
 	routes.RegisterCommentRoutes(router, commentHandler, cfg.JWTSecret)
+	routes.RegisterSubscriptionRoutes(router, subscriptionHandler, cfg.JWTSecret)
 	return router
 }

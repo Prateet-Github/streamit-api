@@ -7,17 +7,26 @@ import (
 )
 
 type User struct {
-	ID        bson.ObjectID `bson:"_id,omitempty" json:"id"`
-	Username  string        `bson:"username" json:"username"`
-	Name      string        `bson:"name" json:"name"`
-	Email     string        `bson:"email" json:"email"`
-	Password  string        `bson:"password,omitempty" json:"-"`
-	Bio       string        `bson:"bio" json:"bio"`
-	CreatedAt time.Time     `bson:"createdAt" json:"createdAt"`
-	UpdatedAt time.Time     `bson:"updatedAt" json:"updatedAt"`
+	ID               bson.ObjectID `bson:"_id,omitempty" json:"id"`
+	Username         string        `bson:"username" json:"username"`
+	Name             string        `bson:"name" json:"name"`
+	Email            string        `bson:"email" json:"email"`
+	Password         string        `bson:"password,omitempty" json:"-"`
+	Bio              string        `bson:"bio" json:"bio"`
+	SubscribersCount int64         `bson:"subscribersCount" json:"subscribersCount"`
+	CreatedAt        time.Time     `bson:"createdAt" json:"createdAt"`
+	UpdatedAt        time.Time     `bson:"updatedAt" json:"updatedAt"`
 }
 
 type UpdateProfileRequest struct {
 	Name string `json:"name"`
 	Bio  string `json:"bio"`
+}
+
+type UserResponse struct {
+	ID               string `json:"id"`
+	Name             string `json:"name"`
+	Username         string `json:"username"`
+	Bio              string `json:"bio"`
+	SubscribersCount int64  `json:"subscribersCount"`
 }

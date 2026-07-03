@@ -132,3 +132,24 @@ func (r *UserRepository) UpdateProfile(
 
 	return &user, nil
 }
+
+func (r *UserRepository) IncrementSubscribers(
+	ctx context.Context,
+	userID bson.ObjectID,
+	delta int,
+) error {
+
+	_, err := r.collection.UpdateOne(
+		ctx,
+		bson.M{
+			"_id": userID,
+		},
+		bson.M{
+			"$inc": bson.M{
+				"subscribersCount": delta,
+			},
+		},
+	)
+
+	return err
+}
