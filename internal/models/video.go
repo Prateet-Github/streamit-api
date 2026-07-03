@@ -87,6 +87,7 @@ type VideoResponse struct {
 	ThumbnailKey string         `json:"thumbnailKey"`
 	Status       VideoStatus    `json:"status"`
 	Owner        *OwnerResponse `json:"owner,omitempty"`
+	CreatedAt    time.Time      `json:"createdAt"`
 }
 
 type VideoListResponse struct {

@@ -315,6 +315,7 @@ func (h *VideoHandler) GetVideoByID(c *gin.Context) {
 		HLSURL:       video.HLSURL,
 		ThumbnailKey: video.ThumbnailKey,
 		Status:       video.Status,
+		CreatedAt:    video.CreatedAt,
 		Owner: &models.OwnerResponse{
 			ID:       user.ID.Hex(),
 			Name:     user.Name,
