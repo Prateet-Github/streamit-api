@@ -3,7 +3,19 @@
 ```text
 [ Client Video Player ]
           │
-          │ (navigator.sendBeacon POST /api/videos/:id/view every 10s)
+          │
+          ▼
+┌──────────────────────────────────────────────┐
+│ HEARTBEAT TRACKER                            │
+│                                              │
+│ - Starts when playback begins                │
+│ - Fires every 10 seconds                     │
+│ - Stops on pause/end                         │
+│ - Resumes on play                            │
+│ - Uses navigator.sendBeacon()                │
+└──────────────────────────────────────────────┘
+          │
+          │ POST /api/videos/:id/view
           ▼
 ┌──────────────────────────────────────────────┐
 │ 1. INGESTION LAYER: Gin API                  │
@@ -44,13 +56,16 @@
 ┌──────────────────────────────────────────────┐
 │ 4. WATCH SESSION VALIDATION                  │
 │                                              │
-│ Redis Set                                    │
-│ Key: track:<viewer>:<video>                  │
+│ Heartbeats Received:                         │
 │                                              │
-│ SADD 10                                      │
-│ SADD 20                                      │
-│ SADD 30                                      │
-│ EXPIRE 5 minutes                             │
+│ 10s → SADD 10                                │
+│ 20s → SADD 20                                │
+│ 30s → SADD 30                                │
+│                                              │
+│ Redis Set                                    │
+│ track:<viewer>:<video>                       │
+│                                              │
+│ EXPIRE 5m                                    │
 │                                              │
 │ SCARD == 3 ?                                 │
 └──────────────────────────────────────────────┘
