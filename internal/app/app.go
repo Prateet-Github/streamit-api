@@ -12,6 +12,7 @@ import (
 	"github.com/Prateet-Github/streamit-api/internal/repositories"
 	"github.com/Prateet-Github/streamit-api/internal/routes"
 	"github.com/Prateet-Github/streamit-api/internal/s3"
+	"github.com/Prateet-Github/streamit-api/internal/services/viewcount"
 	"github.com/gin-contrib/cors"
 )
 
@@ -41,7 +42,7 @@ func New(cfg *config.Config) *gin.Engine {
 		log.Fatal("Redis ping failed: ", err)
 	}
 	log.Println("Redis client connected and verified")
-	redisClient.Close()
+	// redisClient.Close()
 
 	// 4. Asynq Client
 	asynqClient := queue.NewAsynqClient(cfg)
@@ -65,7 +66,8 @@ func New(cfg *config.Config) *gin.Engine {
 
 	channelHandler := handlers.NewChannelHandler(userRepo, videoRepo)
 
-	viewCountHandler := handlers.NewViewCountHandler()
+	producer := viewcount.NewProducer(redisClient)
+	viewCountHandler := handlers.NewViewCountHandler(producer)
 
 	// 6. Router Setup
 	router := gin.Default()

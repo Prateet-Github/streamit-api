@@ -1,18 +1,22 @@
 package handlers
 
 import (
-	"log"
 	"net/http"
+	"time"
 
 	"github.com/Prateet-Github/streamit-api/internal/models"
+	"github.com/Prateet-Github/streamit-api/internal/services/viewcount"
 	"github.com/gin-gonic/gin"
 )
 
 type ViewCountHandler struct {
+	producer *viewcount.Producer
 }
 
-func NewViewCountHandler() *ViewCountHandler {
-	return &ViewCountHandler{}
+func NewViewCountHandler(producer *viewcount.Producer) *ViewCountHandler {
+	return &ViewCountHandler{
+		producer: producer,
+	}
 }
 
 func (h *ViewCountHandler) Heartbeat(c *gin.Context) {
@@ -26,8 +30,25 @@ func (h *ViewCountHandler) Heartbeat(c *gin.Context) {
 	}
 
 	videoID := c.Param("id")
+	viewerID := "anonymous"
 
-	log.Println(videoID, req.Elapsed)
+	err := h.producer.Publish(
+		c.Request.Context(),
+		viewcount.ViewEvent{
+			VideoID:   videoID,
+			ViewerID:  viewerID,
+			Elapsed:   req.Elapsed,
+			Timestamp: time.Now(),
+		},
+	)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "failed to enqueue heartbeat",
+		})
+		return
+	}
 
 	c.Status(http.StatusAccepted)
+
 }
