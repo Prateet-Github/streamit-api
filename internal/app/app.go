@@ -65,6 +65,8 @@ func New(cfg *config.Config) *gin.Engine {
 
 	channelHandler := handlers.NewChannelHandler(userRepo, videoRepo)
 
+	viewCountHandler := handlers.NewViewCountHandler()
+
 	// 6. Router Setup
 	router := gin.Default()
 
@@ -95,6 +97,7 @@ func New(cfg *config.Config) *gin.Engine {
 	routes.RegisterLikeRoutes(router, likeHandler, cfg.JWTSecret)
 	routes.RegisterCommentRoutes(router, commentHandler, cfg.JWTSecret)
 	routes.RegisterSubscriptionRoutes(router, subscriptionHandler, cfg.JWTSecret)
+	routes.RegisterViewCountRoutes(router, viewCountHandler, cfg.JWTSecret)
 	routes.RegisterChannelRoutes(router, channelHandler)
 	return router
 }
