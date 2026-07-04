@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -68,6 +69,14 @@ func New(cfg *config.Config) *gin.Engine {
 
 	producer := viewcount.NewProducer(redisClient)
 	viewCountHandler := handlers.NewViewCountHandler(producer)
+
+	worker := viewcount.NewWorker(redisClient)
+
+	if err := worker.CreateGroup(context.Background()); err != nil {
+		log.Fatal(err)
+	}
+
+	go worker.Start(context.Background())
 
 	// 6. Router Setup
 	router := gin.Default()
