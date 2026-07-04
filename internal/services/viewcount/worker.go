@@ -3,6 +3,7 @@ package viewcount
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -66,7 +67,15 @@ func (w *Worker) Start(ctx context.Context) {
 			for _, msg := range stream.Messages {
 
 				fmt.Println("Event ID:", msg.ID)
-				fmt.Println("Values:", msg.Values)
+
+				// fmt.Println("Values:", msg.Values)
+				event, err := decodeViewEvent(msg.Values)
+				if err != nil {
+					fmt.Println("decode error:", err)
+					continue
+				}
+
+				fmt.Printf("%+v\n", event)
 
 				if err := w.redis.XAck(
 					ctx,
@@ -79,4 +88,28 @@ func (w *Worker) Start(ctx context.Context) {
 			}
 		}
 	}
+}
+
+func decodeViewEvent(values map[string]any) (ViewEvent, error) {
+	videoID, _ := values["videoId"].(string)
+	viewerID, _ := values["viewerId"].(string)
+
+	elapsedStr, _ := values["elapsed"].(string)
+	elapsed, err := strconv.Atoi(elapsedStr)
+	if err != nil {
+		return ViewEvent{}, err
+	}
+
+	timestampStr, _ := values["timestamp"].(string)
+	ts, err := strconv.ParseInt(timestampStr, 10, 64)
+	if err != nil {
+		return ViewEvent{}, err
+	}
+
+	return ViewEvent{
+		VideoID:   videoID,
+		ViewerID:  viewerID,
+		Elapsed:   elapsed,
+		Timestamp: time.Unix(ts, 0),
+	}, nil
 }
