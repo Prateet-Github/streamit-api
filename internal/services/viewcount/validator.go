@@ -39,3 +39,13 @@ func (v *Validator) Validate(
 
 	return count == 3, nil
 }
+
+func (v *Validator) Cleanup(
+	ctx context.Context,
+	event ViewEvent,
+) error {
+
+	key := "track:" + event.ViewerID + ":" + event.VideoID
+
+	return v.redis.Del(ctx, key).Err()
+}

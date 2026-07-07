@@ -17,14 +17,16 @@ const (
 )
 
 type Worker struct {
-	redis     *redis.Client
-	validator *Validator
+	redis        *redis.Client
+	validator    *Validator
+	deduplicator *Deduplicator
 }
 
-func NewWorker(redisClient *redis.Client, validator *Validator) *Worker {
+func NewWorker(redisClient *redis.Client, validator *Validator, deduplicator *Deduplicator) *Worker {
 	return &Worker{
-		redis:     redisClient,
-		validator: validator,
+		redis:        redisClient,
+		validator:    validator,
+		deduplicator: deduplicator,
 	}
 }
 
@@ -79,14 +81,58 @@ func (w *Worker) Start(ctx context.Context) {
 
 				fmt.Printf("%+v\n", event)
 
-				ok, err := w.validator.Validate(ctx, event)
+				// validation check
+
+				valid, err := w.validator.Validate(ctx, event)
 				if err != nil {
-					fmt.Println(err)
+					fmt.Println("validator error:", err)
 					continue
 				}
 
-				fmt.Println("Validation:", ok)
+				fmt.Println("Validation:", valid)
 
+				if !valid {
+					if err := w.redis.XAck(
+						ctx,
+						streamName,
+						groupName,
+						msg.ID,
+					).Err(); err != nil {
+						fmt.Println("ack error:", err)
+					}
+					continue
+				}
+
+				// deduplication check
+
+				unique, err := w.deduplicator.Check(ctx, event)
+				if err != nil {
+					fmt.Println("deduplicator error:", err)
+					continue
+				}
+
+				fmt.Println("Deduplication:", unique)
+
+				if !unique {
+					if err := w.redis.XAck(
+						ctx,
+						streamName,
+						groupName,
+						msg.ID,
+					).Err(); err != nil {
+						fmt.Println("ack error:", err)
+					}
+					continue
+				}
+
+				// cleanup validator state after processing
+				if err := w.validator.Cleanup(ctx, event); err != nil {
+					fmt.Println("cleanup error:", err)
+				}
+
+				// TODO: HyperLogLog for unique view count
+
+				// ack the message after processing
 				if err := w.redis.XAck(
 					ctx,
 					streamName,
@@ -95,6 +141,7 @@ func (w *Worker) Start(ctx context.Context) {
 				).Err(); err != nil {
 					fmt.Println("ack error:", err)
 				}
+
 			}
 		}
 	}
