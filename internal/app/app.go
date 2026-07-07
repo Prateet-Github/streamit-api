@@ -70,7 +70,9 @@ func New(cfg *config.Config) *gin.Engine {
 	producer := viewcount.NewProducer(redisClient)
 	viewCountHandler := handlers.NewViewCountHandler(producer)
 
-	worker := viewcount.NewWorker(redisClient)
+	validator := viewcount.NewValidator(redisClient)
+
+	worker := viewcount.NewWorker(redisClient, validator)
 
 	if err := worker.CreateGroup(context.Background()); err != nil {
 		log.Fatal(err)

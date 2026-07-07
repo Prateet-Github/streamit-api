@@ -17,12 +17,14 @@ const (
 )
 
 type Worker struct {
-	redis *redis.Client
+	redis     *redis.Client
+	validator *Validator
 }
 
-func NewWorker(redisClient *redis.Client) *Worker {
+func NewWorker(redisClient *redis.Client, validator *Validator) *Worker {
 	return &Worker{
-		redis: redisClient,
+		redis:     redisClient,
+		validator: validator,
 	}
 }
 
@@ -76,6 +78,14 @@ func (w *Worker) Start(ctx context.Context) {
 				}
 
 				fmt.Printf("%+v\n", event)
+
+				ok, err := w.validator.Validate(ctx, event)
+				if err != nil {
+					fmt.Println(err)
+					continue
+				}
+
+				fmt.Println("Validation:", ok)
 
 				if err := w.redis.XAck(
 					ctx,
