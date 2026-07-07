@@ -86,6 +86,7 @@ type VideoResponse struct {
 	HLSURL       string         `json:"hlsUrl"`
 	ThumbnailKey string         `json:"thumbnailKey"`
 	Status       VideoStatus    `json:"status"`
+	Views        int64          `json:"views"`
 	Owner        *OwnerResponse `json:"owner,omitempty"`
 	CreatedAt    time.Time      `json:"createdAt"`
 }
