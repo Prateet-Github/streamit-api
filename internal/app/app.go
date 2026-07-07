@@ -73,8 +73,9 @@ func New(cfg *config.Config) *gin.Engine {
 	validator := viewcount.NewValidator(redisClient)
 	deduplicator := viewcount.NewDeduplicator(redisClient)
 	analytics := viewcount.NewAnalytics(redisClient)
+	counter := viewcount.NewCounter(redisClient)
 
-	worker := viewcount.NewWorker(redisClient, validator, deduplicator, analytics)
+	worker := viewcount.NewWorker(redisClient, validator, deduplicator, analytics, counter)
 
 	if err := worker.CreateGroup(context.Background()); err != nil {
 		log.Fatal(err)

@@ -21,14 +21,16 @@ type Worker struct {
 	validator    *Validator
 	deduplicator *Deduplicator
 	analytics    *Analytics
+	counter      *Counter
 }
 
-func NewWorker(redisClient *redis.Client, validator *Validator, deduplicator *Deduplicator, analytics *Analytics) *Worker {
+func NewWorker(redisClient *redis.Client, validator *Validator, deduplicator *Deduplicator, analytics *Analytics, counter *Counter) *Worker {
 	return &Worker{
 		redis:        redisClient,
 		validator:    validator,
 		deduplicator: deduplicator,
 		analytics:    analytics,
+		counter:      counter,
 	}
 }
 
@@ -135,6 +137,11 @@ func (w *Worker) Start(ctx context.Context) {
 				// HyperLogLog analytics for unique viewers
 				if err := w.analytics.Record(ctx, event); err != nil {
 					fmt.Println("analytics error:", err)
+				}
+
+				// Increment the view count for the video
+				if err := w.counter.Increment(ctx, event); err != nil {
+					fmt.Println("counter error:", err)
 				}
 
 				// ack the message after processing
