@@ -64,9 +64,9 @@ The API handles authentication, video uploads, metadata management, channel mana
 - 30-second watch validation
 - View deduplication
 - HyperLogLog analytics
+- Hot counters
+- Write-behind aggregation
 
 ### In Progress
 
-- Hot counters
-- Write-behind aggregation
 - CDN integration

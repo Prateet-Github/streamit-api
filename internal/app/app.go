@@ -83,6 +83,17 @@ func New(cfg *config.Config) *gin.Engine {
 
 	go worker.Start(context.Background())
 
+	viewRepository := repositories.NewViewRepository(db)
+
+	flusher := viewcount.NewFlusher(
+		redisClient,
+		viewRepository,
+	)
+
+	cron := viewcount.NewCron(flusher)
+
+	go cron.Start(context.Background())
+
 	// 6. Router Setup
 	router := gin.Default()
 
