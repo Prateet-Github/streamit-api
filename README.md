@@ -63,10 +63,10 @@ The API handles authentication, video uploads, metadata management, channel mana
 - Redis Streams producer & consumer for view counting
 - 30-second watch validation
 - View deduplication
+- HyperLogLog analytics
 
 ### In Progress
 
-- HyperLogLog analytics
 - Hot counters
 - Write-behind aggregation
 - CDN integration

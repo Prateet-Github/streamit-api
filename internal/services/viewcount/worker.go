@@ -20,13 +20,15 @@ type Worker struct {
 	redis        *redis.Client
 	validator    *Validator
 	deduplicator *Deduplicator
+	analytics    *Analytics
 }
 
-func NewWorker(redisClient *redis.Client, validator *Validator, deduplicator *Deduplicator) *Worker {
+func NewWorker(redisClient *redis.Client, validator *Validator, deduplicator *Deduplicator, analytics *Analytics) *Worker {
 	return &Worker{
 		redis:        redisClient,
 		validator:    validator,
 		deduplicator: deduplicator,
+		analytics:    analytics,
 	}
 }
 
@@ -130,7 +132,10 @@ func (w *Worker) Start(ctx context.Context) {
 					fmt.Println("cleanup error:", err)
 				}
 
-				// TODO: HyperLogLog for unique view count
+				// HyperLogLog analytics for unique viewers
+				if err := w.analytics.Record(ctx, event); err != nil {
+					fmt.Println("analytics error:", err)
+				}
 
 				// ack the message after processing
 				if err := w.redis.XAck(
