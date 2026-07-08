@@ -206,33 +206,35 @@ func (h *SubscriptionHandler) GetSubscriptionStatus(c *gin.Context) {
 
 	userIDHex := c.GetString("userId")
 
-	subscriberID, err := bson.ObjectIDFromHex(userIDHex)
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error": "Unauthorized",
-		})
-		return
-	}
+	subscribed := false
 
-	subscription, err := h.subRepo.FindBySubscriberAndChannel(
-		c.Request.Context(),
-		subscriberID,
-		channelID,
-	)
+	if userIDHex != "" {
 
-	if err != nil && err != mongo.ErrNoDocuments {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Internal server error",
-		})
-		return
+		subscriberID, err := bson.ObjectIDFromHex(userIDHex)
+		if err == nil {
+
+			subscription, err := h.subRepo.FindBySubscriberAndChannel(
+				c.Request.Context(),
+				subscriberID,
+				channelID,
+			)
+
+			if err != nil && err != mongo.ErrNoDocuments {
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"error": "Internal server error",
+				})
+				return
+			}
+
+			subscribed = subscription != nil
+		}
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"subscribed":       subscription != nil,
+		"subscribed":       subscribed,
 		"subscribersCount": channel.SubscribersCount,
 	})
 }
-
 
 func (h *SubscriptionHandler) GetMySubscriptions(c *gin.Context) {
 

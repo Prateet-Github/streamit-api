@@ -13,10 +13,16 @@ func RegisterSubscriptionRoutes(
 ) {
 	subs := router.Group("/api/subscriptions")
 
-	subs.Use(middlewares.Auth(jwtSecret))
+	subs.Use(middlewares.OptionalAuth(jwtSecret))
 
-	subs.GET("/", subscriptionHandler.GetMySubscriptions)
 	subs.GET("/:channelId", subscriptionHandler.GetSubscriptionStatus)
-	subs.POST("/:channelId", subscriptionHandler.Subscribe)
-	subs.DELETE("/:channelId", subscriptionHandler.Unsubscribe)
+
+	protected := router.Group("/api/subscriptions")
+
+	protected.Use(middlewares.Auth(jwtSecret))
+
+	protected.GET("/", subscriptionHandler.GetMySubscriptions)
+	protected.POST("/:channelId", subscriptionHandler.Subscribe)
+	protected.DELETE("/:channelId", subscriptionHandler.Unsubscribe)
+
 }
