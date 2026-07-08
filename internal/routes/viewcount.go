@@ -13,7 +13,7 @@ func RegisterViewCountRoutes(
 ) {
 	viewcount := router.Group("/api/videocount")
 
-	viewcount.Use(middlewares.Auth(jwtSecret))
+	viewcount.Use(middlewares.OptionalAuth(jwtSecret))
 
 	viewcount.POST("/:id/view", viewCountHandler.Heartbeat)
 }
