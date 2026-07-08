@@ -30,7 +30,12 @@ func (h *ViewCountHandler) Heartbeat(c *gin.Context) {
 	}
 
 	videoID := c.Param("id")
-	viewerID := "anonymous"
+	// viewerID := "anonymous"
+	viewerID := c.GetString("userId")
+
+	if viewerID == "" {
+		viewerID = req.ViewerID
+	}
 
 	err := h.producer.Publish(
 		c.Request.Context(),
