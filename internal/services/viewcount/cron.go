@@ -17,16 +17,12 @@ func NewCron(flusher *Flusher) *Cron {
 }
 
 func (c *Cron) Start(ctx context.Context) {
-
 	ticker := time.NewTicker(10 * time.Second)
 	defer ticker.Stop()
 
 	for {
-
 		select {
-
 		case <-ticker.C:
-
 			if err := c.flusher.Flush(ctx); err != nil {
 				log.Println("flush error:", err)
 			}

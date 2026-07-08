@@ -13,12 +13,10 @@ func RegisterVideoRoutes(
 ) {
 	videos := router.Group("/api/video")
 
-	// Public
 	videos.GET("/", videoHandler.GetAllVideos)
 	videos.GET("/search", videoHandler.SearchVideos)
 	videos.GET("/:id", videoHandler.GetVideoByID)
 
-	// Protected
 	auth := videos.Group("")
 	auth.Use(middlewares.Auth(jwtSecret))
 

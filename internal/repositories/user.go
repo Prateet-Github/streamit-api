@@ -167,8 +167,8 @@ func (r *VideoRepository) FindPublicByOwnerID(
 	cursor, err := r.collection.Find(
 		ctx,
 		bson.M{
-			"ownerId": ownerID,
-			"status": models.StatusCompleted,
+			"ownerId":    ownerID,
+			"status":     models.StatusCompleted,
 			"visibility": models.VisibilityPublic,
 		},
 		opts,

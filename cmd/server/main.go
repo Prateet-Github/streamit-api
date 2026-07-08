@@ -11,7 +11,7 @@ import (
 func main() {
 	cfg := config.Load()
 
-	gin.SetMode(gin.ReleaseMode) // Set Gin to release mode for production
+	gin.SetMode(gin.ReleaseMode) // Release mode for production
 
 	server := app.New(cfg)
 

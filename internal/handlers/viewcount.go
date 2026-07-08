@@ -30,7 +30,6 @@ func (h *ViewCountHandler) Heartbeat(c *gin.Context) {
 	}
 
 	videoID := c.Param("id")
-	// viewerID := "anonymous"
 	viewerID := c.GetString("userId")
 
 	if viewerID == "" {

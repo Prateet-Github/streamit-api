@@ -246,7 +246,7 @@ func (h *LikeHandler) GetLikeStatus(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"liked": like != nil,
+		"liked":      like != nil,
 		"likesCount": video.LikesCount,
 	})
 }

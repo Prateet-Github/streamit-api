@@ -15,7 +15,6 @@ func RegisterLikeRoutes(
 
 	likes.Use(middlewares.Auth(jwtSecret))
 
-
 	likes.GET("/:videoId/like", likeHandler.GetLikeStatus)
 	likes.POST("/:videoId/like", likeHandler.Like)
 	likes.DELETE("/:videoId/like", likeHandler.Unlike)

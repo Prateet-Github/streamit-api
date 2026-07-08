@@ -13,7 +13,7 @@ func OptionalAuth(jwtSecret string) gin.HandlerFunc {
 
 		authHeader := c.GetHeader("Authorization")
 
-		// No token -> anonymous user
+		// No token when anonymous user
 		if authHeader == "" {
 			c.Next()
 			return

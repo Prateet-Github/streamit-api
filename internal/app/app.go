@@ -49,7 +49,7 @@ func New(cfg *config.Config) *gin.Engine {
 	asynqClient := queue.NewAsynqClient(cfg)
 	log.Println("Asynq client initialized successfully")
 
-	// 5. Wire Repositories & Handlers
+	// 5. Repositories & Handlers
 	userRepo := repositories.NewUserRepository(db)
 	authHandler := handlers.NewAuthHandler(userRepo, cfg.JWTSecret)
 
@@ -100,7 +100,6 @@ func New(cfg *config.Config) *gin.Engine {
 	router.Use(cors.New(cors.Config{
 		AllowOrigins: []string{
 			"http://localhost:3000",
-			"http://localhost:5173",
 		},
 		AllowMethods: []string{
 			"GET",
