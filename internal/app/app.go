@@ -77,11 +77,13 @@ func New(cfg *config.Config) *gin.Engine {
 
 	worker := viewcount.NewWorker(redisClient, validator, deduplicator, analytics, counter)
 
-	if err := worker.CreateGroup(context.Background()); err != nil {
+	ctx := context.Background()
+
+	if err := worker.CreateGroup(ctx); err != nil {
 		log.Fatal(err)
 	}
 
-	go worker.Start(context.Background())
+	go worker.Start(ctx)
 
 	viewRepository := repositories.NewViewRepository(db)
 
@@ -92,7 +94,7 @@ func New(cfg *config.Config) *gin.Engine {
 
 	cron := viewcount.NewCron(flusher)
 
-	go cron.Start(context.Background())
+	go cron.Start(ctx)
 
 	// 6. Router Setup
 	router := gin.Default()
