@@ -2,6 +2,7 @@
 .github
 
 .env
+.env.prod
 .env.*
 
 tmp/
