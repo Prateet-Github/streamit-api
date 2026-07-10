@@ -8,7 +8,8 @@ import (
 func NewAsynqClient(cfg *config.Config) *asynq.Client {
 	return asynq.NewClient(
 		asynq.RedisClientOpt{
-			Addr: cfg.RedisHost + ":" + cfg.RedisPort,
+			Addr:     cfg.RedisHost + ":" + cfg.RedisPort,
+			Password: cfg.RedisPassword,
 		},
 	)
 }
