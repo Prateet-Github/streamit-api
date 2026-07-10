@@ -1,8 +1,8 @@
 # StreamIt API
 
-Backend API for **StreamIt**, a scalable video streaming platform built with Go.
+Backend API for **StreamIt**, a distributed video streaming platform built with Go.
 
-The API handles authentication, video uploads, metadata management, channel management, subscriptions, likes, comments, asynchronous video processing, and an event-driven view counting pipeline.
+The API powers authentication, media uploads, channel management, social interactions, asynchronous video processing, and a scalable event-driven view analytics pipeline.
 
 ---
 
@@ -12,9 +12,9 @@ The API handles authentication, video uploads, metadata management, channel mana
 - Gin
 - MongoDB
 - Redis
+- Redis Streams
 - Asynq
 - AWS S3
-- FFmpeg
 - Docker
 
 ---
@@ -22,16 +22,19 @@ The API handles authentication, video uploads, metadata management, channel mana
 ## Features
 
 - JWT authentication
-- Video upload with presigned S3 URLs
-- Asynchronous video processing using Asynq
-- HLS video streaming support
+- Video uploads via presigned S3 URLs
+- Asynchronous video processing with Asynq
+- Adaptive HLS streaming support
 - Channel profiles
 - Subscribe / Unsubscribe system
 - Like & Unlike videos
 - Comment system
 - Search API
-- Background workers
-- Event-driven view counting pipeline (Redis Streams)
+- Distributed view counting pipeline
+- Heartbeat-based watch validation
+- View deduplication
+- HyperLogLog unique viewer analytics
+- Hot counters & write-behind aggregation
 - RESTful API
 - Dockerized
 
@@ -41,32 +44,7 @@ The API handles authentication, video uploads, metadata management, channel mana
 
 - Gin HTTP API
 - MongoDB for persistent storage
-- Redis for queues, streams, and caching
-- Asynq workers for video processing
-- Redis Streams for asynchronous view event ingestion
-- AWS S3 for video and asset storage
-
----
-
-## Status
-
-### Implemented
-
-- Authentication
-- Video uploads
-- HLS processing pipeline
-- Channel management
-- Subscription system
-- Likes
-- Comments
-- Search
-- Redis Streams producer & consumer for view counting
-- 30-second watch validation
-- View deduplication
-- HyperLogLog analytics
-- Hot counters
-- Write-behind aggregation
-
-### In Progress
-
-- CDN integration
+- Redis for queues, streams, and hot counters
+- Redis Streams & Consumer Groups for event processing
+- Asynq workers for asynchronous video processing
+- AWS S3 for media storage
