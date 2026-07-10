@@ -101,7 +101,7 @@ func New(cfg *config.Config) *gin.Engine {
 
 	router.Use(cors.New(cors.Config{
 		AllowOrigins: []string{
-			"http://localhost:3000",
+			cfg.FrontendURL,
 		},
 		AllowMethods: []string{
 			"GET",

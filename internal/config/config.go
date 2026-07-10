@@ -22,6 +22,8 @@ type Config struct {
 	RedisHost     string
 	RedisPort     string
 	RedisPassword string
+
+	FrontendURL string
 }
 
 func Load() *Config {
@@ -45,5 +47,6 @@ func Load() *Config {
 		RedisHost:          os.Getenv("REDIS_HOST"),
 		RedisPort:          os.Getenv("REDIS_PORT"),
 		RedisPassword:      os.Getenv("REDIS_PASSWORD"),
+		FrontendURL:        os.Getenv("FRONTEND_URL"),
 	}
 }
