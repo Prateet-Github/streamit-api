@@ -1,0 +1,10 @@
+.git
+.github
+
+.env
+.env.*
+
+tmp/
+coverage/
+
+README.md
